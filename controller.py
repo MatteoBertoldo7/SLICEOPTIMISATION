@@ -15,8 +15,8 @@ class SDNController(app_manager.RyuApp):
         self.byte_trasmessi = {}
         self.byte_ricevuti = {}
         #metto soglia di allarme al 90% della banda che ha a disposizione il wifi pubblico
-        self.soglia_di_allarme = 500000000 * 0.9 
-        self.soglia_di_allarme_security = 500000000 * 0.85  # Soglia al 85% della banda (DEVO METTERE LA SUA DI BANDA PERO'
+        self.soglia_di_allarme = 500 * 1024 * 1024 * 0.9 #90% della sua banda 
+        self.soglia_di_allarme_security = 80 * 1024 * 1024 * 0.85  # Soglia al 85% della banda 
         self.last_measurement_time = time.time()
         self.slice_states = {'s1': 'on', 's2': 'on', 's3': 'on', 's4': 'on', 's5': 'on'}
         self.add_message_handler(SliceControlMessage, self.handle_slice_control_message)
@@ -38,9 +38,12 @@ class SDNController(app_manager.RyuApp):
             self.byte_ricevuti[dp_id] = byte_ricevuti
 
             utilizzo_banda = (byte_trasmessi + byte_ricevuti) / elapsed_time
-            if utilizzo_banda > self.soglia_di_allarme:
+            if utilizzo_banda > self.soglia_di_allarme_security:
                 logging.warning("L'utilizzo della banda per lo switch %s ha superato la soglia di allarme.", dp_id)
                 self.condividi_banda(dp_id, utilizzo_banda)
+            elif utilizzo_banda > self.soglia_di_allarme:
+                logging.warning("L'utilizzo della banda per lo switch %s ha superato la soglia di allarme.", dp_id)
+                self.condividi_banda(dp_id, utilizzo_banda)              
 
     def condividi_banda(self, switch_id, utilizzo_slice):
         if switch_id == 's1':
@@ -55,22 +58,22 @@ class SDNController(app_manager.RyuApp):
 
     def redistribuisci_banda(self, utilizzo_wifi_pubblico):
         # Imposta manualmente le limitazioni di banda per 's3' (traffic) e 's2' (iot)
-        if 's3' in self.byte_trasmessi:
-            self.byte_trasmessi['s3'] = 100 * 1024 * 1024  # 100 MB in byte
-            self.byte_ricevuti['s3'] = 100 * 1024 * 1024  # 100 MB in byte
-        if 's2' in self.byte_trasmessi:
-            self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # 50 MB in byte
-            self.byte_ricevuti['s2'] = 50 * 1024 * 1024  # 50 MB in byte
+        if 's3' in self.byte_trasmessi: #normalmente è 100 totale (metto 60)
+            self.byte_trasmessi['s3'] = 30 * 1024 * 1024  # 30 MB in byte
+            self.byte_ricevuti['s3'] = 30 * 1024 * 1024  # 30 MB in byte
+        if 's2' in self.byte_trasmessi: #normalmente è 50, metto a 30
+            self.byte_trasmessi['s2'] = 15 * 1024 * 1024  # 15 MB in byte
+            self.byte_ricevuti['s2'] = 15 * 1024 * 1024  # 15 MB in byte
 
         if utilizzo_wifi_pubblico < self.soglia_di_allarme * 0.66:
-            # Reimposta le bande originali per 's2' e 's3'
-            self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # DEVO METTERE I DATI ORIGINALI
-            self.byte_ricevuti['s2'] = 50 * 1024 * 1024
-            self.byte_trasmessi['s3'] = 100 * 1024 * 1024
-            self.byte_ricevuti['s3'] = 100 * 1024 * 1024
+            # Reimposta le bande originali per 's2' e 's3' (50 e 100)
+            self.byte_trasmessi['s2'] = 25 * 1024 * 1024 
+            self.byte_ricevuti['s2'] = 25 * 1024 * 1024
+            self.byte_trasmessi['s3'] = 50 * 1024 * 1024
+            self.byte_ricevuti['s3'] = 50 * 1024 * 1024
         else:
-            banda_restante = utilizzo_wifi_pubblico - (100 * 1024 * 1024 + 50 * 1024 * 1024)
-            banda_per_area = banda_restante
+            banda_restante = utilizzo_wifi_pubblico - (60 * 1024 * 1024 + 30 * 1024 * 1024)
+            banda_per_area = banda_restante / 2
 
         for switch_id in self.byte_trasmessi:
             if switch_id != 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
@@ -81,15 +84,25 @@ class SDNController(app_manager.RyuApp):
 
     def redistribuisci_banda_security(self, utilizzo_security):
         # Imposta manualmente le limitazioni di banda per le altre slice
-        self.byte_trasmessi['s1'] = 500 * 1024 * 1024  # 500 MB in byte
-        self.byte_ricevuti['s1'] = 500 * 1024 * 1024  # 500 MB in byte
-        self.byte_trasmessi['s2'] = 20 * 1024 * 1024  # 20 MB in byte
-        self.byte_ricevuti['s2'] = 20 * 1024 * 1024  # 20 MB in byte
-        self.byte_trasmessi['s3'] = 100 * 1024 * 1024  # 100 MB in byte
-        self.byte_ricevuti['s3'] = 100 * 1024 * 1024  # 100 MB in byte
+        self.byte_trasmessi['s1'] = 200 * 1024 * 1024  # 200 MB in byte
+        self.byte_ricevuti['s1'] = 200 * 1024 * 1024  # 200 MB in byte
+        self.byte_trasmessi['s2'] = 15 * 1024 * 1024  # 20 MB in byte
+        self.byte_ricevuti['s2'] = 15 * 1024 * 1024  # 20 MB in byte
+        self.byte_trasmessi['s3'] = 30 * 1024 * 1024  # 100 MB in byte
+        self.byte_ricevuti['s3'] = 30 * 1024 * 1024  # 100 MB in byte
+
+        if utilizzo_security < self.soglia_di_allarme_security * 0.66:
+            # Reimposta le bande originali per 's1' 's2' e 's3' (500, 50 e 100)
+            self.byte_trasmessi['s1'] = 250 * 1024 * 1024
+            self.byte_ricevuti['s1'] = 250 * 1024 * 1024  
+            self.byte_trasmessi['s2'] = 25 * 1024 * 1024 
+            self.byte_ricevuti['s2'] = 25 * 1024 * 1024
+            self.byte_trasmessi['s3'] = 50 * 1024 * 1024
+            self.byte_ricevuti['s3'] = 50 * 1024 * 1024
 
         # Calcola la banda rimanente per la slice "security"
-        banda_restante_security = utilizzo_security - (500 * 1024 * 1024 + 20 * 1024 * 1024 + 100 * 1024 * 1024)
+        banda_restante_security = utilizzo_security - (400 * 1024 * 1024 + 60 * 1024 * 1024 + 30 * 1024 * 1024)
+        banda_restante_security = banda_restante_security / 2
 
         # Distribuisci la banda rimanente alla slice "security"
         if 's4' in self.byte_trasmessi:
