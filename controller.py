@@ -15,8 +15,8 @@ class SDNController(app_manager.RyuApp):
         self.byte_trasmessi = {}
         self.byte_ricevuti = {}
         #metto soglia di allarme al 90% della banda che ha a disposizione il wifi pubblico
-        self.soglia_di_allarme = 500 * 1024 * 1024 * 0.9 #90% della sua banda 
-        self.soglia_di_allarme_security = 80 * 1024 * 1024 * 0.85  # Soglia al 85% della banda 
+        self.soglia_di_allarme = 500000000 * 0.9  # 90% di 500 Mbps
+        self.soglia_di_allarme_security = 80000000 * 0.85  # 85% di 80 Mbps
         self.last_measurement_time = time.time()
         self.slice_states = {'s1': 'on', 's2': 'on', 's3': 'on', 's4': 'on', 's5': 'on'}
         self.add_message_handler(SliceControlMessage, self.handle_slice_control_message)
