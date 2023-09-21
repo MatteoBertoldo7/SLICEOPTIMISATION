@@ -54,6 +54,13 @@ class SDNController(app_manager.RyuApp):
 
         #num_aree_di_rete = len(self.byte_trasmessi)
         
+    if utilizzo_wifi_pubblico < self.soglia_di_allarme * 0.66:
+            # Reimposta le bande originali per 's2' e 's3'
+            self.byte_trasmessi['s2'] = 50 * 1024 * 1024
+            self.byte_ricevuti['s2'] = 50 * 1024 * 1024
+            self.byte_trasmessi['s3'] = 100 * 1024 * 1024
+            self.byte_ricevuti['s3'] = 100 * 1024 * 1024
+        else:
             banda_restante = utilizzo_wifi_pubblico - (100 * 1024 * 1024 + 50 * 1024 * 1024)
             banda_per_area = banda_restante
         
