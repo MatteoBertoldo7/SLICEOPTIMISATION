@@ -52,10 +52,10 @@ class SDNController(app_manager.RyuApp):
             self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # 50 MB in byte
             self.byte_ricevuti['s2'] = 50 * 1024 * 1024  # 50 MB in byte
 
-        num_aree_di_rete = len(self.byte_trasmessi)
-        if num_aree_di_rete > 2:
+        #num_aree_di_rete = len(self.byte_trasmessi)
+        
             banda_restante = utilizzo_wifi_pubblico - (100 * 1024 * 1024 + 50 * 1024 * 1024)
-            banda_per_area = banda_restante / (num_aree_di_rete - 2)
+            banda_per_area = banda_restante
         
         for switch_id in self.byte_trasmessi:
             if switch_id != 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
