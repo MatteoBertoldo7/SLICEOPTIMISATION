@@ -38,15 +38,16 @@ class SDNController(app_manager.RyuApp):
                 logging.warning("L'utilizzo della banda per lo switch %s ha superato la soglia di allarme.", dp_id)
                 self.condividi_banda(dp_id, utilizzo_banda)
 
-    def condividi_banda(self, switch_id, utilizzo_wifi_pubblico):
-        if switch_id == 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
+    def condividi_banda(self, switch_id, utilizzo_slice):
+        if switch_id == 's1':
             wifi_pubblico_utilizzo = self.byte_trasmessi.get(switch_id, 0) + self.byte_ricevuti.get(switch_id, 0)
             if wifi_pubblico_utilizzo > self.soglia_di_allarme:
-                self.redistribuisci_banda(utilizzo_wifi_pubblico)
+                self.redistribuisci_banda(utilizzo_slice)
         elif switch_id == 's4':
             security_utilizzo = self.byte_trasmessi.get(switch_id, 0) + self.byte_ricevuti.get(switch_id, 0)
             if security_utilizzo > self.soglia_di_allarme_security:
-                self.redistribuisci_banda_security(utilizzo_slice)
+                self.redistribuisci_banda_security(utilizzo_security)  # Cambia qui
+
 
     def redistribuisci_banda(self, utilizzo_wifi_pubblico):
         # Imposta manualmente le limitazioni di banda per 's3' (traffic) e 's2' (iot)
