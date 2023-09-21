@@ -32,9 +32,9 @@ class CustomTopology(Topo):
 
         # Collegamenti tra switch delle slice
         self.addLink(wifi_switch, communication_switch, bw=500, delay='10ms', loss=0, use_htb=True)
-        self.addLink(iot_switch, communication_switch, bw=20, delay='25ms', loss=0, use_htb=True)
+        self.addLink(iot_switch, communication_switch, bw=50, delay='25ms', loss=0, use_htb=True)
         self.addLink(traffic_switch, communication_switch, bw=100, delay='2ms', loss=0, use_htb=True)
-        self.addLink(safety_switch, communication_switch, bw=50, delay='8ms', loss=0, use_htb=True)
+        self.addLink(safety_switch, communication_switch, bw=80, delay='8ms', loss=0, use_htb=True)
 
         # Collegamenti tra switch e host delle slice
         self.addLink(wifi_host1, wifi_switch)
