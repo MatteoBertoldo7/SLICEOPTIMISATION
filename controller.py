@@ -16,6 +16,7 @@ class SDNController(app_manager.RyuApp):
         self.byte_ricevuti = {}
         #metto soglia di allarme al 90% della banda che ha a disposizione il wifi pubblico
         self.soglia_di_allarme = 500000000 * 0.9 
+        self.soglia_di_allarme_security = 500000000 * 0.85  # Soglia al 85% della banda (DEVO METTERE LA SUA DI BANDA PERO'
         self.last_measurement_time = time.time()
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
@@ -42,6 +43,10 @@ class SDNController(app_manager.RyuApp):
             wifi_pubblico_utilizzo = self.byte_trasmessi.get(switch_id, 0) + self.byte_ricevuti.get(switch_id, 0)
             if wifi_pubblico_utilizzo > self.soglia_di_allarme:
                 self.redistribuisci_banda(utilizzo_wifi_pubblico)
+        elif switch_id == 's4':
+            security_utilizzo = self.byte_trasmessi.get(switch_id, 0) + self.byte_ricevuti.get(switch_id, 0)
+            if security_utilizzo > self.soglia_di_allarme_security:
+                self.redistribuisci_banda_security(utilizzo_slice)
 
     def redistribuisci_banda(self, utilizzo_wifi_pubblico):
         # Imposta manualmente le limitazioni di banda per 's3' (traffic) e 's2' (iot)
@@ -68,6 +73,26 @@ class SDNController(app_manager.RyuApp):
             if switch_id != 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
                 self.byte_trasmessi[switch_id] = banda_per_area
                 self.byte_ricevuti[switch_id] = banda_per_area
+
+
+    def redistribuisci_banda_security(self, utilizzo_security):
+        # Imposta manualmente le limitazioni di banda per le altre slice
+        self.byte_trasmessi['s1'] = 500 * 1024 * 1024  # 500 MB in byte
+        self.byte_ricevuti['s1'] = 500 * 1024 * 1024  # 500 MB in byte
+        self.byte_trasmessi['s2'] = 20 * 1024 * 1024  # 20 MB in byte
+        self.byte_ricevuti['s2'] = 20 * 1024 * 1024  # 20 MB in byte
+        self.byte_trasmessi['s3'] = 100 * 1024 * 1024  # 100 MB in byte
+        self.byte_ricevuti['s3'] = 100 * 1024 * 1024  # 100 MB in byte
+
+        # Calcola la banda rimanente per la slice "security"
+        banda_restante_security = utilizzo_security - (500 * 1024 * 1024 + 20 * 1024 * 1024 + 100 * 1024 * 1024)
+
+        # Distribuisci la banda rimanente alla slice "security"
+        if 's4' in self.byte_trasmessi:
+            self.byte_trasmessi['s4'] = banda_restante_security
+            self.byte_ricevuti['s4'] = banda_restante_security
+
+
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
