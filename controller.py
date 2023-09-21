@@ -53,31 +53,30 @@ class SDNController(app_manager.RyuApp):
                 self.redistribuisci_banda_security(utilizzo_security)  # Cambia qui
 
 
-    def redistribuisci_banda(self, utilizzo_wifi_pubblico):
-        # Imposta manualmente le limitazioni di banda per 's3' (traffic) e 's2' (iot)
-        if 's3' in self.byte_trasmessi:
-            self.byte_trasmessi['s3'] = 100 * 1024 * 1024  # 100 MB in byte
-            self.byte_ricevuti['s3'] = 100 * 1024 * 1024  # 100 MB in byte
-        if 's2' in self.byte_trasmessi:
-            self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # 50 MB in byte
-            self.byte_ricevuti['s2'] = 50 * 1024 * 1024  # 50 MB in byte
+def redistribuisci_banda(self, utilizzo_wifi_pubblico):
+    # Imposta manualmente le limitazioni di banda per 's3' (traffic) e 's2' (iot)
+    if 's3' in self.byte_trasmessi:
+        self.byte_trasmessi['s3'] = 100 * 1024 * 1024  # 100 MB in byte
+        self.byte_ricevuti['s3'] = 100 * 1024 * 1024  # 100 MB in byte
+    if 's2' in self.byte_trasmessi:
+        self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # 50 MB in byte
+        self.byte_ricevuti['s2'] = 50 * 1024 * 1024  # 50 MB in byte
 
-        #num_aree_di_rete = len(self.byte_trasmessi)
-        
     if utilizzo_wifi_pubblico < self.soglia_di_allarme * 0.66:
-            # Reimposta le bande originali per 's2' e 's3'
-            self.byte_trasmessi['s2'] = 50 * 1024 * 1024  #DEVO METTERE I DATI ORIGINALI
-            self.byte_ricevuti['s2'] = 50 * 1024 * 1024
-            self.byte_trasmessi['s3'] = 100 * 1024 * 1024
-            self.byte_ricevuti['s3'] = 100 * 1024 * 1024
-        else:
-            banda_restante = utilizzo_wifi_pubblico - (100 * 1024 * 1024 + 50 * 1024 * 1024)
-            banda_per_area = banda_restante
-        
-        for switch_id in self.byte_trasmessi:
-            if switch_id != 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
-                self.byte_trasmessi[switch_id] = banda_per_area
-                self.byte_ricevuti[switch_id] = banda_per_area
+        # Reimposta le bande originali per 's2' e 's3'
+        self.byte_trasmessi['s2'] = 50 * 1024 * 1024  # DEVO METTERE I DATI ORIGINALI
+        self.byte_ricevuti['s2'] = 50 * 1024 * 1024
+        self.byte_trasmessi['s3'] = 100 * 1024 * 1024
+        self.byte_ricevuti['s3'] = 100 * 1024 * 1024
+    else:
+        banda_restante = utilizzo_wifi_pubblico - (100 * 1024 * 1024 + 50 * 1024 * 1024)
+        banda_per_area = banda_restante
+
+    for switch_id in self.byte_trasmessi:
+        if switch_id != 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
+            self.byte_trasmessi[switch_id] = banda_per_area
+            self.byte_ricevuti[switch_id] = banda_per_area
+
 
 
     def redistribuisci_banda_security(self, utilizzo_security):
