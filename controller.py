@@ -110,18 +110,21 @@ class SDNController(app_manager.RyuApp):
             self.byte_ricevuti['s4'] = banda_restante_security
 
 
-    def handle_slice_control_message(self, msg):
-        slice_id = msg.slice_id
-        action = msg.action
+  def handle_slice_control_message(self, msg):
+    slice_id = msg.slice_id
+    action = msg.action
 
-        if action == 'on':
-            self.slice_states[slice_id] = 'on'
-            # Avvia la slice (es. abilita le regole del flusso)
-        elif action == 'off':
-            self.slice_states[slice_id] = 'off'
-            # Spegni la slice (es. disabilita le regole del flusso)
-
-
+    if action == 'on':
+        self.slice_states[slice_id] = 'on'
+        # Avvia la slice (es. abilita le regole del flusso)
+    elif action == 'off':
+        self.slice_states[slice_id] = 'off'
+        # Spegni la slice (es. disabilita le regole del flusso)
+    elif action == 'restart':
+        # Implementa l'azione per riaccendere la slice qui.
+        # Questa parte dipende da come intendi riavviare una slice specifica.
+        # Ad esempio, potresti reimpostare le regole del flusso, le limitazioni di banda, ecc.
+        self.slice_states[slice_id] = 'on'
 
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
