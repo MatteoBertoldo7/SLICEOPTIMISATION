@@ -1,0 +1,10 @@
+mettiamo altre regole di flusso?
+
+se tipo mettessimo che IOT possa solo usare UDP (dovrebbe essere facile) cosi implementiamo sta cosa
+tipo un termostato / rilevatore di non so cosa deve inviare semplicemente roba in diretta e può permettere perdita pacchetti
+
+BOH IO HO MESSO HOST E SERVER NELLA RETE MA NON SO SE SERVONO AHAH --> AL MASSIMO TROVARE UNO SCOPO A LORO
+
+scrivere una bella descrizione per il prof con foto e grafici
+
+verificare con i programmi se sta roba funziona
