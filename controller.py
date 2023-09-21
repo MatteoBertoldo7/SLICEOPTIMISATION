@@ -18,6 +18,10 @@ class SDNController(app_manager.RyuApp):
         self.soglia_di_allarme = 500000000 * 0.9 
         self.soglia_di_allarme_security = 500000000 * 0.85  # Soglia al 85% della banda (DEVO METTERE LA SUA DI BANDA PERO'
         self.last_measurement_time = time.time()
+        self.slice_states = {'s1': 'on', 's2': 'on', 's3': 'on', 's4': 'on', 's5': 'on'}
+        self.add_message_handler(SliceControlMessage, self.handle_slice_control_message)
+
+
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def flow_stats_reply_handler(self, ev):
@@ -94,6 +98,19 @@ class SDNController(app_manager.RyuApp):
             self.byte_ricevuti['s4'] = banda_restante_security
 
 
+    def handle_slice_control_message(self, msg):
+        slice_id = msg.slice_id
+        action = msg.action
+
+        if action == 'on':
+            self.slice_states[slice_id] = 'on'
+            # Avvia la slice (es. abilita le regole del flusso)
+        elif action == 'off':
+            self.slice_states[slice_id] = 'off'
+            # Spegni la slice (es. disabilita le regole del flusso)
+
+
+
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
@@ -116,3 +133,9 @@ class SDNController(app_manager.RyuApp):
 if __name__ == '__main__':
     from ryu.cmd import manager
     manager.main(['ryu', 'controller.py'])
+
+class SliceControlMessage(object):
+    def __init__(self, slice_id, action):
+        self.slice_id = slice_id
+        self.action = action  # 'on' o 'off'
+
