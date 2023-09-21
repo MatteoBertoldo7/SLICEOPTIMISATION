@@ -14,7 +14,8 @@ class SDNController(app_manager.RyuApp):
         super(SDNController, self).__init__(*args, **kwargs)
         self.byte_trasmessi = {}
         self.byte_ricevuti = {}
-        self.soglia_di_allarme = 1000000
+        #metto soglia di allarme al 90% della banda che ha a disposizione il wifi pubblico
+        self.soglia_di_allarme = 500000000 * 0.9 
         self.last_measurement_time = time.time()
 
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
@@ -39,7 +40,7 @@ class SDNController(app_manager.RyuApp):
     def condividi_banda(self, switch_id, utilizzo_wifi_pubblico):
         if switch_id == 's1':  # Cambia 's1' con l'ID corretto dello switch WiFi pubblico
             wifi_pubblico_utilizzo = self.byte_trasmessi.get(switch_id, 0) + self.byte_ricevuti.get(switch_id, 0)
-            if wifi_pubblico_utilizzo > 0.9 * self.soglia_di_allarme:
+            if wifi_pubblico_utilizzo > self.soglia_di_allarme:
                 self.redistribuisci_banda(utilizzo_wifi_pubblico)
 
     def redistribuisci_banda(self, utilizzo_wifi_pubblico):
