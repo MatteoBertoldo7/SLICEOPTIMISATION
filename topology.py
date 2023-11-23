@@ -19,12 +19,14 @@ class CustomTopology(Topo):
         traffic_switch = self.addSwitch('s3')
         safety_switch = self.addSwitch('s4')
         communication_switch = self.addSwitch('s5')
+        allarme_switch = self.addSwitch('s6')
 
         # Aggiungi gli host per le cinque slice (quinta non ha host)
         wifi_host1 = self.addHost('h11')
         wifi_host2 = self.addHost('h12')
         iot_host1 = self.addHost('h21')
         iot_host2 = self.addHost('h22')
+        iot_host3 = self.addHost('h23')
         traffic_host1 = self.addHost('h31')
         traffic_host2 = self.addHost('h32')
         safety_host1 = self.addHost('h41')
@@ -35,12 +37,18 @@ class CustomTopology(Topo):
         self.addLink(iot_switch, communication_switch, bw=50, delay='25ms', loss=0, use_htb=True)
         self.addLink(traffic_switch, communication_switch, bw=100, delay='2ms', loss=0, use_htb=True)
         self.addLink(safety_switch, communication_switch, bw=80, delay='8ms', loss=0, use_htb=True)
+        self.addLink(iot_switch, allarme_switch, bw=50, delay='25ms', loss=0, use_htb=True)
+        self.addLink(allarme_switch, safety_switch, bw=50, delay='25ms', loss=0, use_htb=True)
 
         # Collegamenti tra switch e host delle slice
         self.addLink(wifi_host1, wifi_switch)
         self.addLink(wifi_host2, wifi_switch)
         self.addLink(iot_host1, iot_switch)
         self.addLink(iot_host2, iot_switch)
+        self.addLink(iot_host3, iot_switch)
+        self.addLink(iot_host1, allarme_switch)
+        self.addLink(iot_host2, allarme_switch)
+        self.addLink(safety_host1, allarme_switch)        
         self.addLink(traffic_host1, traffic_switch)
         self.addLink(traffic_host2, traffic_switch)
         self.addLink(safety_host1, safety_switch)
@@ -48,17 +56,17 @@ class CustomTopology(Topo):
 
         # Crea i 5 server
         wifi_server = self.addHost('server1')
-        iot_server = self.addHost('server2')
-        traffic_server = self.addHost('server3')
-        safety_server = self.addHost('server4')
-        communication_server = self.addHost('server5')
+        uno_server = self.addHost('server2')
+        due_server = self.addHost('server3')
+        tre_server = self.addHost('server4')
+        quattro_server = self.addHost('server5')
 
         # Collegamenti tra switch e server
         self.addLink(wifi_server, wifi_switch)
-        self.addLink(iot_server, iot_switch)
-        self.addLink(traffic_server, traffic_switch)
-        self.addLink(safety_server, safety_switch)
-        self.addLink(communication_server, communication_switch)
+        self.addLink(uno_server, communication_switch)
+        self.addLink(due_server, communication_switch)
+        self.addLink(tre_server, communication_switch)
+        self.addLink(quattro_server, communication_switch)
 
         # Definisci le subnet per ciascuna slice
         wifi_subnet = IPv4Network('192.168.1.0/24')
@@ -72,6 +80,7 @@ class CustomTopology(Topo):
         wifi_host2.setIP(str(wifi_subnet[2]))
         iot_host1.setIP(str(iot_subnet[1]))
         iot_host2.setIP(str(iot_subnet[2]))
+        iot_host2.setIP(str(iot_subnet[3]))
         traffic_host1.setIP(str(traffic_subnet[1]))
         traffic_host2.setIP(str(traffic_subnet[2]))
         safety_host1.setIP(str(safety_subnet[1]))
