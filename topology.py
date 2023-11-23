@@ -60,7 +60,7 @@ class CustomTopology(Topo):
         due_server = self.addHost('server3')
         tre_server = self.addHost('server4')
         quattro_server = self.addHost('server5')
-        datacollection_server = self.addHost('server4')
+        datacollection_server = self.addHost('server6')
 
 
         # Collegamenti tra switch e server
