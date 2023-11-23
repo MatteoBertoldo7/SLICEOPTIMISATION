@@ -54,12 +54,14 @@ class CustomTopology(Topo):
         self.addLink(sirens, safety_switch)
         self.addLink(webcams, safety_switch)
 
-        # Crea i 5 server
+        # Crea i 6 server
         wifi_server = self.addHost('server1')
         uno_server = self.addHost('server2')
         due_server = self.addHost('server3')
         tre_server = self.addHost('server4')
         quattro_server = self.addHost('server5')
+        datacollection_server = self.addHost('server4')
+
 
         # Collegamenti tra switch e server
         self.addLink(wifi_server, wifi_switch)
@@ -67,6 +69,7 @@ class CustomTopology(Topo):
         self.addLink(due_server, communication_switch)
         self.addLink(tre_server, communication_switch)
         self.addLink(quattro_server, communication_switch)
+        self.addLink(datacollection_server, iot_switch)
 
         # Definisci le subnet per ciascuna slice
         wifi_subnet = IPv4Network('192.168.1.0/24')
