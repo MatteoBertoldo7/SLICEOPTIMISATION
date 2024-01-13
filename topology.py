@@ -13,46 +13,37 @@ class CustomTopology(Topo):
         # Inizializzazione
         Topo.__init__(self)
 
+        host_config = dict(inNamespace=True)
+        slice1_link_config = dict()
+        slice2_link_config = dict()
+        slice3_link_config = dict()
+        slice4_link_config = dict()
+        connecting_slices_link_config = dict()
+        host_link_config = dict()
+        server_link_config = dict()
+
         # Aggiungi gli switch per le cinque slice
-        wifi_switch = self.addSwitch('s1')
-        iot_switch = self.addSwitch('s2')
-        traffic_switch = self.addSwitch('s3')
-        safety_switch = self.addSwitch('s4')
-        communication_switch = self.addSwitch('s5')
-        allarme_switch = self.addSwitch('s6')
+        #wifi_switch = self.addSwitch('s1')
+        #iot_switch = self.addSwitch('s2')
+        #traffic_switch = self.addSwitch('s3')
+        #safety_switch = self.addSwitch('s4')
+        #communication_switch = self.addSwitch('s5')
+        #allarme_switch = self.addSwitch('s6')
+
+        for i in range(5):
+            sconfig = {"dpid": "%016x" % (i + 1)}
+            self.addSwitch("s%d" % (i + 1), protocols="OpenFlow10", **sconfig)
 
         # Aggiungi gli host per le cinque slice (quinta non ha host)
-        schoolrouter = self.addHost('h11')
-        townhallrouter = self.addHost('h12')
-        sismicsensor = self.addHost('h21')
-        watersensor = self.addHost('h22')
-        weathersensor = self.addHost('h23')
-        trafficlight = self.addHost('h31')
-        parkingsensor = self.addHost('h32')
-        webcams = self.addHost('h41')
-        sirens = self.addHost('h42')
-
-        # Collegamenti tra switch delle slice
-        self.addLink(wifi_switch, communication_switch, bw=500, delay='10ms', loss=0, use_htb=True)
-        self.addLink(iot_switch, communication_switch, bw=50, delay='25ms', loss=0, use_htb=True)
-        self.addLink(traffic_switch, communication_switch, bw=100, delay='2ms', loss=0, use_htb=True)
-        self.addLink(safety_switch, communication_switch, bw=80, delay='8ms', loss=0, use_htb=True)
-        self.addLink(iot_switch, allarme_switch, bw=50, delay='25ms', loss=0, use_htb=True)
-        self.addLink(allarme_switch, safety_switch, bw=50, delay='25ms', loss=0, use_htb=True)
-
-        # Collegamenti tra switch e host delle slice
-        self.addLink(schoolrouter, wifi_switch)
-        self.addLink(townhallrouter, wifi_switch)
-        self.addLink(sismicsensor, iot_switch)
-        self.addLink(watersensor, iot_switch)
-        self.addLink(weathersensor, iot_switch)
-        self.addLink(sismicsensor, allarme_switch)
-        self.addLink(watersensor, allarme_switch)
-        self.addLink(sirens, allarme_switch)        
-        self.addLink(trafficlight, traffic_switch)
-        self.addLink(parkingsensor, traffic_switch)
-        self.addLink(sirens, safety_switch)
-        self.addLink(webcams, safety_switch)
+        schoolrouter = self.addHost('h11', **host_config)
+        townhallrouter = self.addHost('h12', **host_config)
+        sismicsensor = self.addHost('h21', **host_config)
+        watersensor = self.addHost('h22', **host_config)
+        weathersensor = self.addHost('h23', **host_config)
+        trafficlight = self.addHost('h31', **host_config)
+        parkingsensor = self.addHost('h32', **host_config)
+        webcams = self.addHost('h41', **host_config)
+        sirens = self.addHost('h42', **host_config)
 
         # Crea i 6 server
         wifi_server = self.addHost('server1')
@@ -62,14 +53,36 @@ class CustomTopology(Topo):
         quattro_server = self.addHost('server5')
         datacollection_server = self.addHost('server6')
 
+        # Collegamenti tra switch delle slice
+        self.addLink('s1', 's5')
+        self.addLink('s2', 's5')
+        self.addLink('s3', 's5')
+        self.addLink('s4', 's5')
+        self.addLink('s2', 's6')
+        self.addLink('s6', 's4')
+
+        # Collegamenti tra switch e host delle slice
+        self.addLink(schoolrouter, 's1')
+        self.addLink(townhallrouter, 's1')
+        self.addLink(sismicsensor, 's2')
+        self.addLink(watersensor, 's2')
+        self.addLink(weathersensor, 's2')
+        self.addLink(sismicsensor, 's6')
+        self.addLink(watersensor, 's6')
+        self.addLink(sirens, 's6')
+        self.addLink(trafficlight, 's3')
+        self.addLink(parkingsensor, 's3')
+        self.addLink(sirens, 's4')
+        self.addLink(webcams, 's4')
+
 
         # Collegamenti tra switch e server
-        self.addLink(wifi_server, wifi_switch)
-        self.addLink(uno_server, communication_switch)
-        self.addLink(due_server, communication_switch)
-        self.addLink(tre_server, communication_switch)
-        self.addLink(quattro_server, communication_switch)
-        self.addLink(datacollection_server, iot_switch)
+        self.addLink(wifi_server, 's1')
+        self.addLink(uno_server, 's5')
+        self.addLink(due_server, 's5')
+        self.addLink(tre_server, 's5')
+        self.addLink(quattro_server, 's5')
+        self.addLink(datacollection_server, 's2')
 
         # Definisci le subnet per ciascuna slice
         wifi_subnet = IPv4Network('192.168.1.0/24')
