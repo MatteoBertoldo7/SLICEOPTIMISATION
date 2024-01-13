@@ -127,5 +127,6 @@ if __name__ == '__main__':
 
     net['s6'].cmd("ovs-vsctl set-controller s6 tcp:127.0.0.1:6637")
 
+
     CLI(net)
     net.stop()
