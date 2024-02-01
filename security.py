@@ -78,8 +78,8 @@ class SimpleSwitch(app_manager.RyuApp):
 
         out_port = 0
 
-        #dump packets and avoid to save rows in switch 4 and 5 when the destination is not reachable
-        if (dpid == 4 and msg.in_port == 1 and dst != "00:00:00:00:00:02") or (dpid == 5 and msg.in_port == 1 and dst != "00:00:00:00:00:06"):
+        #dump packets and avoid to save rows in switch 1 and 5 when the destination is not reachable
+        if (dpid == 1 and msg.in_port == 1 and dst != "00:00:00:00:00:02") or (dpid == 5 and msg.in_port == 1 and dst != "00:00:00:00:00:01"):
             return
 
         
