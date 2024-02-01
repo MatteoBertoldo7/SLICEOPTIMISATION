@@ -77,11 +77,6 @@ class SimpleSwitch(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = msg.in_port
 
         out_port = 0
-
-        #dump packets and avoid to save rows in switch 1 and 5 when the destination is not reachable
-        if (dpid == 1 and msg.in_port == 1 and dst != "00:00:00:00:00:02") or (dpid == 5 and msg.in_port == 1 and dst != "00:00:00:00:00:01"):
-            return
-
         
         if dpid in self.end_switches:
             out_port = self.slice_to_port[dpid][msg.in_port]
