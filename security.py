@@ -29,7 +29,8 @@ class SimpleSwitch(app_manager.RyuApp):
 
         # out_port = slice_to_port[dpid][in_port]
         self.slice_to_port = {
-            1: {1: 3, 2: 3, 3: 0}
+            1: {1: 3, 2: 3, 3: 0},
+            5: {1: 0, 2: 1, 3: 1}
         }
 
-        self.end_switches = [1]
+        self.end_switches = [1, 5]
