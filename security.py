@@ -52,4 +52,63 @@ class SimpleSwitch(app_manager.RyuApp):
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
 
+        def _packet_in_handler(self, ev):
+        msg = ev.msg
+        datapath = msg.datapath
+        ofproto = datapath.ofproto
+
+        pkt = packet.Packet(msg.data)
+        eth = pkt.get_protocol(ethernet.ethernet)
+
+        if eth.ethertype == ether_types.ETH_TYPE_LLDP:
+            # ignore lldp packet
+            return
+        dst = eth.dst
+        src = eth.src
+        
+
+        dpid = datapath.id
+        
+        self.mac_to_port.setdefault(dpid, {})
+
+        #self.logger.info("LOG packet in %s %s %s %s", dpid, src, dst, msg.in_port)
+
+        # learn a mac address to avoid FLOOD next time.
+        self.mac_to_port[dpid][src] = msg.in_port
+
+        out_port = 0
+
+        #dump packets and avoid to save rows in switch 4 and 5 when the destination is not reachable
+        if (dpid == 4 and msg.in_port == 1 and dst != "00:00:00:00:00:02") or (dpid == 5 and msg.in_port == 1 and dst != "00:00:00:00:00:06"):
+            return
+
+        
+        if dpid in self.end_switches:
+            out_port = self.slice_to_port[dpid][msg.in_port]
+        elif dpid in self.mac_to_port:
+            if dst in self.mac_to_port[dpid]:
+                out_port = self.mac_to_port[dpid][dst]
+            else:
+                out_port = ofproto.OFPP_FLOOD
+        else:
+            out_port = ofproto.OFPP_FLOOD
+
+        actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
+
+        # install a flow to avoid packet_in next time
+        if out_port != ofproto.OFPP_FLOOD and out_port != 0 and dst in self.hosts and src in self.hosts:
+            self.add_flow(datapath, msg.in_port, dst, src, actions)
+
+        data = None
+        if msg.buffer_id == ofproto.OFP_NO_BUFFER:
+            data = msg.data
+
+        out = datapath.ofproto_parser.OFPPacketOut(
+            datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
+            actions=actions, data=data)
+        if out_port!=0:
+            datapath.send_msg(out)
+
+    @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)
+
     
