@@ -14,11 +14,11 @@ class CustomTopology(Topo):
         Topo.__init__(self)
 
         host_config = dict(inNamespace=True)
-        connecting_slice_link_config = dict(bw=50, delay='1ms')
+        connecting_slice_link_config = dict(bw=50)
         host_link_config = dict()
         server_link_config = dict()
 
-        for i in range(5):
+        for i in range(6):
             sconfig = {"dpid": "%016x" % (i + 1)}
             self.addSwitch("s%d" % (i + 1), protocols="OpenFlow10", **sconfig)
 
@@ -86,10 +86,8 @@ if __name__ == '__main__':
     net['s2'].cmd("ovs-vsctl set-controller s2 tcp:127.0.0.1:6634")
     net['s3'].cmd("ovs-vsctl set-controller s3 tcp:127.0.0.1:6635")
     net['s4'].cmd("ovs-vsctl set-controller s4 tcp:127.0.0.1:6636")
-
-    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6633 tcp:127.0.0.1:6635")
-
+    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6633")
+    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6635")
     net['s6'].cmd("ovs-vsctl set-controller s6 tcp:127.0.0.1:6637")
-
     CLI(net)
     net.stop()
