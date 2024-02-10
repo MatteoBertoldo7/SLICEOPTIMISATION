@@ -35,11 +35,11 @@ class CustomTopology(Topo):
 
         # Crea i 6 server
         proxy_server = self.addHost('proxy_server', **host_config)
-        uno_server = self.addHost('server2', **host_config)
-        due_server = self.addHost('server3', **host_config)
-        tre_server = self.addHost('server4', **host_config)
-        quattro_server = self.addHost('server5', **host_config)
-        datacollection_server = self.addHost('server6', **host_config)
+        server1 = self.addHost('server1', **host_config)
+        server2 = self.addHost('server2', **host_config)
+        server3 = self.addHost('server3', **host_config)
+        server4 = self.addHost('server4', **host_config)
+        datacollection_server = self.addHost('datacollection_server', **host_config)
 
         # Collegamenti tra switch delle slice
         self.addLink('s1', 's6', **connecting_slice_link_config)
@@ -63,10 +63,10 @@ class CustomTopology(Topo):
 
         # Collegamenti tra switch e server
         self.addLink(proxy_server, 's4')
-        self.addLink(uno_server, 's6')
-        self.addLink(due_server, 's6')
-        self.addLink(tre_server, 's6')
-        self.addLink(quattro_server, 's6')
+        self.addLink(server1, 's6')
+        self.addLink(server2, 's6')
+        self.addLink(server3, 's6')
+        self.addLink(server4, 's6')
         self.addLink(datacollection_server, 's3')
 
 if __name__ == '__main__':
