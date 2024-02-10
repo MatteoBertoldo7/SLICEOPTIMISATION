@@ -34,7 +34,7 @@ class CustomTopology(Topo):
         sirens = self.addHost('h12', **host_config)
 
         # Crea i 6 server
-        wifi_server = self.addHost('server1', **host_config)
+        proxy_server = self.addHost('proxy_server', **host_config)
         uno_server = self.addHost('server2', **host_config)
         due_server = self.addHost('server3', **host_config)
         tre_server = self.addHost('server4', **host_config)
