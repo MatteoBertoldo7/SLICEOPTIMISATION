@@ -29,7 +29,7 @@ class CustomTopology(Topo):
         watersensor = self.addHost('06', **host_config)
         weathersensor = self.addHost('07', **host_config)
         trafficlight = self.addHost('03', **host_config)
-        parkingsensor = self.addHost('02', **host_config)
+        parkingsensor = self.addHost('04', **host_config)
         webcams = self.addHost('01', **host_config)
         sirens = self.addHost('02', **host_config)
 
