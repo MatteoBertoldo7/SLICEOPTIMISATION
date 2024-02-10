@@ -22,14 +22,8 @@ class SimpleSwitch(app_manager.RyuApp):
 
         # outport = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
+            2: {"00:00:00:00:00:03": 1, "00:00:00:00:00:04": 2, "00:00:00:00:00:0d": 3}
         }
-
-        # out_port = slice_to_port[dpid][in_port]
-        self.slice_to_port = {
-            2: {1: 2, 2: 1, 3: 0}
-        }
-
-        self.end_switches = [2]
 
     def add_flow(self, datapath, in_port, dst, src, actions):
         ofproto = datapath.ofproto
@@ -71,9 +65,7 @@ class SimpleSwitch(app_manager.RyuApp):
 
         out_port = 0
 
-        if dpid in self.end_switches:
-            out_port = self.slice_to_port[dpid][msg.in_port]
-        elif dpid in self.mac_to_port:
+        if dpid in self.mac_to_port:
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             else:
