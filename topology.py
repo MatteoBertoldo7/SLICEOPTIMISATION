@@ -62,7 +62,7 @@ class CustomTopology(Topo):
         self.addLink(webcams, 's1', **host_link_config)
 
         # Collegamenti tra switch e server
-        self.addLink(wifi_server, 's4')
+        self.addLink(proxy_server, 's4')
         self.addLink(uno_server, 's6')
         self.addLink(due_server, 's6')
         self.addLink(tre_server, 's6')
