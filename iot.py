@@ -22,7 +22,10 @@ class SimpleSwitch(app_manager.RyuApp):
 
         # outport = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
-            #FAI PATH
+            3: {"00:00:00:00:00:05": 2, "00:00:00:00:00:06": 3, "00:00:00:00:00:08": 4, "00:00:00:00:00:07": 5,
+                "00:00:00:00:0e": 1},
+
+            5: {"00:00:00:00:00:05": 1, "00:00:00:00:00:06": 2, "00:00:00:00:00:02": 1}
         }
 
     def add_flow(self, datapath, in_port, dst, src, actions):
