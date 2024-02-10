@@ -62,12 +62,13 @@ class CustomTopology(Topo):
         self.addLink(webcams, 's1', **host_link_config)
 
         # Collegamenti tra switch e server
-        self.addLink(proxy_server, 's4')
-        self.addLink(server1, 's6')
-        self.addLink(server2, 's6')
-        self.addLink(server3, 's6')
-        self.addLink(server4, 's6')
-        self.addLink(datacollection_server, 's3')
+        self.addLink(proxy_server, 's4', **server_link_config)
+        self.addLink(server1, 's6', **server_link_config)
+        self.addLink(server2, 's6', **server_link_config)
+        self.addLink(server3, 's6', **server_link_config)
+        self.addLink(server4, 's6', **server_link_config)
+        self.addLink(datacollection_server, 's3', **server_link_config)
+
 
 if __name__ == '__main__':
     topo = CustomTopology()
@@ -89,5 +90,6 @@ if __name__ == '__main__':
     net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6633")
     net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6635")
     net['s6'].cmd("ovs-vsctl set-controller s6 tcp:127.0.0.1:6637")
+
     CLI(net)
     net.stop()
