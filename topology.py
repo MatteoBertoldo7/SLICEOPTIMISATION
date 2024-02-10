@@ -23,23 +23,23 @@ class CustomTopology(Topo):
             self.addSwitch("s%d" % (i + 1), protocols="OpenFlow10", **sconfig)
 
         # Aggiungi gli host per le cinque slice (quinta non ha host)
-        schoolrouter = self.addHost('09', **host_config)
-        townhallrouter = self.addHost('0a', **host_config)
-        sismicsensor = self.addHost('05', **host_config)
-        watersensor = self.addHost('06', **host_config)
-        weathersensor = self.addHost('07', **host_config)
-        trafficlight = self.addHost('03', **host_config)
-        parkingsensor = self.addHost('04', **host_config)
-        webcams = self.addHost('01', **host_config)
-        sirens = self.addHost('02', **host_config)
+        schoolrouter = self.addHost('h11', **host_config)
+        townhallrouter = self.addHost('h12', **host_config)
+        sismicsensor = self.addHost('h21', **host_config)
+        watersensor = self.addHost('h22', **host_config)
+        weathersensor = self.addHost('h23', **host_config)
+        trafficlight = self.addHost('h31', **host_config)
+        parkingsensor = self.addHost('h32', **host_config)
+        webcams = self.addHost('h41', **host_config)
+        sirens = self.addHost('h42', **host_config)
 
         # Crea i 6 server
-        proxy_server = self.addHost('proxy_server', **host_config)
-        server1 = self.addHost('server1', **host_config)
-        server2 = self.addHost('server2', **host_config)
-        server3 = self.addHost('server3', **host_config)
-        server4 = self.addHost('server4', **host_config)
-        datacollection_server = self.addHost('datacollection_server', **host_config)
+        wifi_server = self.addHost('server1', **host_config)
+        uno_server = self.addHost('server2', **host_config)
+        due_server = self.addHost('server3', **host_config)
+        tre_server = self.addHost('server4', **host_config)
+        quattro_server = self.addHost('server5', **host_config)
+        datacollection_server = self.addHost('server6', **host_config)
 
         # Collegamenti tra switch delle slice
         self.addLink('s1', 's6', **connecting_slice_link_config)
@@ -62,13 +62,12 @@ class CustomTopology(Topo):
         self.addLink(webcams, 's1', **host_link_config)
 
         # Collegamenti tra switch e server
-        self.addLink(proxy_server, 's4', **server_link_config)
-        self.addLink(server1, 's6', **server_link_config)
-        self.addLink(server2, 's6', **server_link_config)
-        self.addLink(server3, 's6', **server_link_config)
-        self.addLink(server4, 's6', **server_link_config)
-        self.addLink(datacollection_server, 's3', **server_link_config)
-
+        self.addLink(wifi_server, 's4')
+        self.addLink(uno_server, 's6')
+        self.addLink(due_server, 's6')
+        self.addLink(tre_server, 's6')
+        self.addLink(quattro_server, 's6')
+        self.addLink(datacollection_server, 's3')
 
 if __name__ == '__main__':
     topo = CustomTopology()
@@ -90,6 +89,5 @@ if __name__ == '__main__':
     net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6633")
     net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6635")
     net['s6'].cmd("ovs-vsctl set-controller s6 tcp:127.0.0.1:6637")
-
     CLI(net)
     net.stop()
