@@ -94,10 +94,10 @@ class SimpleSwitch(app_manager.RyuApp):
         src = eth.src
 
         dpid = datapath.id
-        self.mac_to_port.setdefault(dpid, {})
+        #self.mac_to_port.setdefault(dpid, {})
 
         # learn a mac address to avoid FLOOD next time.
-        self.mac_to_port[dpid][src] = msg.in_port
+        #self.mac_to_port[dpid][src] = msg.in_port
 
         #self.logger.info("LOG packet in %s %s %s %s", dpid, src, dst, msg.in_port)
 
@@ -111,14 +111,16 @@ class SimpleSwitch(app_manager.RyuApp):
         else:
             out_port = ofproto.OFPP_FLOOD
 
-        protocol = 1
-
+        protocol = 0
         if pkt.get_protocol(udp.udp):
             protocol = 1  # UDP
         elif pkt.get_protocol(tcp.tcp):
             protocol = 2  # TCP
         elif pkt.get_protocol(icmp.icmp):
             protocol = 3  # ICMP
+
+        if protocol not in [1, 2, 3]:
+            return
 
         # filter the udp packets, sending them to the corresponding server
         #if pkt.get_protocol(udp.udp) and msg.in_port != 4 and msg.in_port != 5 and msg.in_port != 6:
@@ -167,9 +169,6 @@ class SimpleSwitch(app_manager.RyuApp):
         #else:
             #return
 
-        self.logger.info("[LOG] switch:%s %s %s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
-                         out_port, protocol)
-
         #if out_port == 0 or (not pkt.get_protocol(udp.udp) and (dst in self.servers)):
             # drop packets recieved from servers (they are filter servers)
             #return
@@ -178,7 +177,7 @@ class SimpleSwitch(app_manager.RyuApp):
 
         # install a flow to avoid packet_in next time
         # install an additional column for the packet type
-        if out_port != ofproto.OFPP_FLOOD and dst in self.hosts and src in self.hosts:
+        if out_port != ofproto.OFPP_FLOOD and dst in self.hosts and src in self.hosts and protocol != 0:
             self.add_flow(datapath, msg.in_port, dst, src, actions, protocol)
 
         data = None
@@ -189,6 +188,8 @@ class SimpleSwitch(app_manager.RyuApp):
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
 
+        self.logger.info("[LOG] switch:%s %s %s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
+                         out_port, protocol)
         datapath.send_msg(out)
 
     @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)

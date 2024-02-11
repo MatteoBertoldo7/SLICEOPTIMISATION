@@ -17,6 +17,10 @@ class SimpleSwitch(app_manager.RyuApp):
              "00:00:00:00:00:09", "00:00:00:00:00:0a", "00:00:00:00:00:0b", "00:00:00:00:00:0c",
              "00:00:00:00:00:0d", "00:00:00:00:00:0e", "00:00:00:00:00:0f"]
 
+    connecting_linked_hosts = ['00:00:00:00:00:0e']
+
+    security_linked_hosts = ['00:00:00:00:00:02']
+
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch, self).__init__(*args, **kwargs)
 
@@ -76,8 +80,6 @@ class SimpleSwitch(app_manager.RyuApp):
         else:
             out_port = ofproto.OFPP_FLOOD
 
-        self.logger.info("LOG packet in %s %s %s %s %s", dpid, src, dst, msg.in_port, out_port)
-
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 
         # install a flow to avoid packet_in next time
@@ -91,7 +93,15 @@ class SimpleSwitch(app_manager.RyuApp):
         out = datapath.ofproto_parser.OFPPacketOut(
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
+
+        if dpid == 3 and out_port == 1 and dst not in self.connecting_linked_hosts:
+            return
+
+        if dpid == 5 and out_port == 3 and dst not in self.security_linked_hosts:
+            return
+
         if out_port != 0:
+            self.logger.info("LOG packet in %s %s %s %s %s", dpid, src, dst, msg.in_port, out_port)
             datapath.send_msg(out)
 
     @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)
