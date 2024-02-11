@@ -17,7 +17,11 @@ class SimpleSwitch(app_manager.RyuApp):
              "00:00:00:00:00:09", "00:00:00:00:00:0a", "00:00:00:00:00:0b", "00:00:00:00:00:0c",
              "00:00:00:00:00:0d", "00:00:00:00:00:0e", "00:00:00:00:00:0f"]
 
-    connecting_linked_hosts = ["00:00:00:00:00:0d"]
+    linked_hosts = ["00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:0d"]
+
+    conn_dst = ["00:00:00:00:00:0d"]
+
+    traffic_src = ["00:00:00:00:00:03", "00:00:00:00:00:04"]
 
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch, self).__init__(*args, **kwargs)
@@ -75,10 +79,18 @@ class SimpleSwitch(app_manager.RyuApp):
         else:
             out_port = ofproto.OFPP_FLOOD
 
+        if out_port == 3 and ((src not in self.traffic_src) or (dst not in self.conn_dst)):
+            self.logger.info('PACCHETTO DA SLICE 2 A CONNECTING, INVALIDO')
+            out_port = 0
+
+        if out_port in [1, 2] and dst not in self.traffic_src:
+            self.logger.info('PACCHETTO DA SLICE 2 A SLICE 2, INVALIDO')
+            out_port = 0
+
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 
         # install a flow to avoid packet_in next time
-        if out_port != ofproto.OFPP_FLOOD and out_port != 0 and dst in self.hosts and src in self.hosts:
+        if out_port != ofproto.OFPP_FLOOD and out_port != 0 and dst in self.linked_hosts:
             self.add_flow(datapath, msg.in_port, dst, src, actions)
 
         data = None
@@ -88,9 +100,6 @@ class SimpleSwitch(app_manager.RyuApp):
         out = datapath.ofproto_parser.OFPPacketOut(
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
-
-        if out_port == 3 and dst not in self.connecting_linked_hosts:
-            return
 
         if out_port != 0:
             self.logger.info("LOG packet in %s %s %s %s %s", dpid, src, dst, msg.in_port, out_port)
