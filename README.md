@@ -45,6 +45,11 @@ mininet> pingall
 ```
 IMMAGINE
 
+3. To view the ports of every switch, execute the following command in the Mininet console:
+```
+mininet> ports
+```
+IMMAGINE
 
 
 
