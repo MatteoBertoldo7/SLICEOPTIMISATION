@@ -1,17 +1,49 @@
 # Dynamic Network Slicing (DNS) for a Smart City (da rivedere il titolo)
 
-This project has been developed for the Softwarized and Virtualized Mobile Networks course by:
-*Nicola Conti - Matricola: 
-*Matteo Bertoldo - Matricola:
-*Federico Iop - Matricola: 218598
+This project has been developed for the Softwarized and Virtualized Mobile Networks course by:  
+* Nicola Conti - Matricola:  
+* Matteo Bertoldo - Matricola:  
+* Federico Iop - Matricola: 218598  
 
 
+## Introduction
 
 
+## The topology
+![](images/network_topology.jpg)
 
 
+## Setting up the network   
+In order to setting up the network follow the following commands:  
+1. From the comnetsemu repository, initiate and log into the virtual machine by running:  
+```
+vagrant up comnetsemu
+vagrant ssh comnetsemu
+```
+
+2. Execute the script to activate the RYU controllers and load the application:
+```
+./slice_setup.sh
+```
+
+3. Open a second terminal and run the following command to start mininet and create the network's topology:
+```
+sudo python3 topology.py
+```
 
 
+## Testing the network  
+1. We can verify the correct creation of the network topology by using the following command in the mininet console:
+```
+links
+```
+IMMAGINE
+
+2. To conduct a ping reachability test, enter the following command in the mininet console:
+```
+mininet> pingall
+```
+IMMAGINE
 
 
 
