@@ -1,3 +1,52 @@
+# Dynamic Network Slicing (DNS) for a Smart City (da rivedere il titolo)
+
+This project has been developed for the Softwarized and Virtualized Mobile Networks course by:
+*Nicola Conti - Matricola: 
+*Matteo Bertoldo - Matricola:
+*Federico Iop - Matricola: 218598
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 LA MIA IDEA E' SIMULARE UN DYNAMIC NETWORK SLICING (DNS) PER UNA CITTA' SMART
 
 UNA RETE IN CUI CI SONO VARIE SLICE: WIFI PUBBLICO, SICUREZZA, TRAFFICO SMART, IOT E UNA SLICE CHE INTERCONNETTE QUESTE 4
