@@ -6,7 +6,25 @@ This project has been developed for the Softwarized and Virtualized Mobile Netwo
 * Federico Iop - Matricola: 218598  
 
 
-## Introduction
+## Introduction  
+This project revolves around constructing an SDN (Software-Defined Networking) for a smart city by implementing a virtual network using the combined frameworks of Ryu and Mininet.  
+
+The network topology has five distinct slices:  
+1. Security
+2. Smart traffic
+3. IoT
+4. Public Internet
+5. Connecting
+
+The first four slices are connected to the connecting slice, which houses the servers for each respective slice. For instance, Server 1 is dedicated to the Slice 1 - Security. The connecting slice serves as a bridge between the slices and their respective servers.  
+
+Furthermore, the connecting slice facilitates communication between the webcams in Slice 1 and the routers in Slice 4. Switch 5 in the network is employed to establish a direct link between seismic sensors and water level sensors with the sirens (UDP?). This setup ensures prompt activation of the sirens in emergency situations.  
+
+CONTROLLO UDP E SCRIVO CHE COMUNICANO CON PROTOCOLLO TCPIP
+
+
+
+
 
 
 ## The topology
@@ -14,7 +32,7 @@ This project has been developed for the Softwarized and Virtualized Mobile Netwo
 
 
 ## Setting up the network   
-In order to setting up the network follow the following commands:  
+To set up the network, follow these commands:  
 1. From the comnetsemu repository, initiate and log into the virtual machine by running:  
 ```
 vagrant up comnetsemu
@@ -39,17 +57,19 @@ links
 ```
 IMMAGINE
 
-2. To conduct a ping reachability test, enter the following command in the mininet console:
+2. To view the ports of every switch, execute the following command in the mininet console:
+```
+mininet> ports
+```
+IMMAGINE
+
+3. To conduct a ping reachability test, enter the following command in the mininet console:
 ```
 mininet> pingall
 ```
 IMMAGINE
 
-3. To view the ports of every switch, execute the following command in the Mininet console:
-```
-mininet> ports
-```
-IMMAGINE
+
 
 
 
