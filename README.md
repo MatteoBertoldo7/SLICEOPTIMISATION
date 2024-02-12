@@ -82,7 +82,7 @@ IMMAGINE
 The ping reachibility test follows these constraints:  
 * Servers within the communication slice can communicate with each other.  
 * Each host in the respective slice can communicate with the server using the same slice number. For example, hosts in slice 2 can communicate with server 2.  
-* The Webcams host (01) can communicate with hosts in slice 4.  
+* The Webcams host (01) can communicate with routers in slice 4.  
 * The Seismic Sensor (05) and River Water Level Sensor (06) can communicate with Public Alert Sirens (02) for security-related purposes.
 
 
