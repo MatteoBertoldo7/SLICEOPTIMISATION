@@ -53,17 +53,28 @@ sudo python3 topology.py
 ## Testing the network  
 1. We can verify the correct creation of the network topology by using the following command in the mininet console:
 ```
-links
+mininet> links
 ```
-IMMAGINE
+![](images/links_test.png)  
+
+
 
 2. To view the ports of every switch, execute the following command in the mininet console:
 ```
 mininet> ports
 ```
-IMMAGINE
+IMMAGINE  
 
-3. To conduct a ping reachability test, enter the following command in the mininet console:
+
+3. To view every network's nodes, execute the following command in the mininet console:
+```
+mininet> nodes
+```
+![](images/nodes_test.png)  
+
+
+
+4. To conduct a ping reachability test, enter the following command in the mininet console:
 ```
 mininet> pingall
 ```
