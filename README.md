@@ -81,8 +81,30 @@ The ping reachibility test follows these constraints:
 * The Webcams host (01) can communicate with routers in slice 4.  
 * The Seismic Sensor (05) and River Water Level Sensor (06) can communicate with Public Alert Sirens (02) for security-related purposes.
 
-5. test da 03 a server 3
-6. da 09 a 01
-7. da 05 a 02 (UDP test)
-8. da 03 a 04, intraslice
+5. To make a ping test between the host 03 and the server 2, which is in another slice, run the following command:
+```
+mininet> 03 ping server2
+```
+![](images/ping_03_server2_test.png)  
+
+6. To make a ping test between the host 03 and host 04, which are in the same slice, run the following command:
+```
+mininet> 03 ping 04
+```
+![](images/ping_03_04_test.png)  
+
+7. To make a ping test between the host 0a and host 01, which is in another slice, run the following command:
+```
+mininet> 0a ping 01
+```
+![](images/ping_0a_01_test.png)  
+
+  
+8. To send an UDP packet from 06 to 02 run the following command:
+```
+mininet> 02 iperf -s -u&  
+mininet> 06 iperf -c 02 -u -t 10 -i 1
+```
+![](images/UDP_06_02_test.png)  
+
 
