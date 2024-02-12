@@ -1,4 +1,4 @@
-# Dynamic Network Slicing (DNS) for a Smart City (da rivedere il titolo)
+# Dynamic Network Slicing (DNS) for a Smart City 
 
 This project has been developed for the Softwarized and Virtualized Mobile Networks course by:  
 * Nicola Conti - Matricola: 218098
