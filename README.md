@@ -78,7 +78,8 @@ mininet> nodes
 ```
 mininet> pingall
 ```
-IMMAGINE  
+![](images/pingall_test.png)  
+
 The ping reachibility test follows these constraints:  
 * Servers within the communication slice can communicate with each other.  
 * Each host in the respective slice can communicate with the server using the same slice number. For example, hosts in slice 2 can communicate with server 2.  
