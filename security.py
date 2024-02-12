@@ -32,8 +32,8 @@ class SimpleSwitch(app_manager.RyuApp):
 
         # outport = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
-            1: {"00:00:00:00:00:01": 1, "00:00:00:00:00:02": 2, "00:00:00:00:00:09": 3, "00:00:00:00:00:0a": 3,
-                "00:00:00:00:00:0c": 3}
+            1: {"00:00:00:00:00:01": 1, "00:00:00:00:00:02": 2, "00:00:00:00:00:05": 3, "00:00:00:00:00:06": 3,
+                "00:00:00:00:00:09": 3, "00:00:00:00:00:0a": 3, "00:00:00:00:00:0c": 3}
         }
 
     def add_flow(self, datapath, in_port, dst, src, actions):
@@ -67,13 +67,6 @@ class SimpleSwitch(app_manager.RyuApp):
 
         dpid = datapath.id
 
-        out_port = 0
-
-        if dpid in self.mac_to_port:
-            if dst in self.mac_to_port[dpid]:
-                self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
-                out_port = self.mac_to_port[dpid][dst]
-
         protocol = 0
         if pkt.get_protocol(udp.udp):
             protocol = 1  # UDP
@@ -85,8 +78,20 @@ class SimpleSwitch(app_manager.RyuApp):
         if protocol not in [1, 2, 3]:
             return
 
-        if protocol != 1 and src in self.udp_src and dst in self.udp_dst:
-            out_port = 0
+        out_port = 0
+
+        if dpid in self.mac_to_port:
+            if dst in self.mac_to_port[dpid]:
+                self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
+                out_port = self.mac_to_port[dpid][dst]
+
+        #if not pkt.get_protocol(tcp.tcp) and src in self.udp_src and dst in self.udp_dst:
+            #out_port = 3  # force port towards s5 for udp packets from 02 towards 05 or 06
+        if not pkt.get_protocol(tcp.tcp):
+            if (src in self.udp_src and dst in self.udp_dst):
+                out_port = 3
+            elif (src in self.udp_dst and dst in self.udp_src):
+                out_port = 2
 
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 
@@ -121,4 +126,4 @@ class SimpleSwitch(app_manager.RyuApp):
         elif reason == ofproto.OFPPR_MODIFY:
             self.logger.info("port modified %s", port_no)
         else:
-            self.logger.info("Illeagal port state %s %s", port_no, reason)
+            self.logger.info("Illegal port state %s %s", port_no, reason)
