@@ -18,7 +18,7 @@ The network topology has five distinct slices:
 
 The first four slices are connected to the connecting slice, which houses the servers for each respective slice. For instance, Server 1 is dedicated to the Slice 1 - Security. The connecting slice serves as a bridge between the slices and their respective servers.  
 
-Furthermore, the connecting slice facilitates communication between the webcams in Slice 1 and the routers in Slice 4. Switch 5 in the network is employed to establish a direct link between seismic sensors and water level sensors with the sirens (UDP?). This setup ensures prompt activation of the sirens in emergency situations.  
+Furthermore, the connecting slice facilitates communication between the webcams in Slice 1 and the routers in Slice 4. Switch 5 in the network is employed to establish a direct link between sismic sensors and water level sensors with the sirens (UDP?). This setup ensures prompt activation of the sirens in emergency situations.  
 
 CONTROLLO UDP E SCRIVO CHE COMUNICANO CON PROTOCOLLO TCPIP
 
@@ -53,21 +53,38 @@ sudo python3 topology.py
 ## Testing the network  
 1. We can verify the correct creation of the network topology by using the following command in the mininet console:
 ```
-links
+mininet> links
 ```
-IMMAGINE
+![](images/links_test.png)  
+
+
 
 2. To view the ports of every switch, execute the following command in the mininet console:
 ```
 mininet> ports
 ```
-IMMAGINE
+![](images/ports_test.png) 
 
-3. To conduct a ping reachability test, enter the following command in the mininet console:
+
+3. To view every network's nodes, execute the following command in the mininet console:
+```
+mininet> nodes
+```
+![](images/nodes_test.png)  
+
+
+
+4. To conduct a ping reachability test, enter the following command in the mininet console:
 ```
 mininet> pingall
 ```
-IMMAGINE
+IMMAGINE  
+The ping reachibility test follows these constraints:  
+* Servers within the communication slice can communicate with each other.  
+* Each host in the respective slice can communicate with the server using the same slice number. For example, hosts in slice 2 can communicate with server 2.  
+* The Webcams host (01) can communicate with routers in slice 4.  
+* The Seismic Sensor (05) and River Water Level Sensor (06) can communicate with Public Alert Sirens (02) for security-related purposes.
+
 
 
 
