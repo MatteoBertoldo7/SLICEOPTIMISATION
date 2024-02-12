@@ -7,6 +7,9 @@ from ryu.lib.mac import haddr_to_bin
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 from ryu.lib.packet import ether_types
+from ryu.lib.packet import udp
+from ryu.lib.packet import tcp
+from ryu.lib.packet import icmp
 
 
 class SimpleSwitch(app_manager.RyuApp):
@@ -17,21 +20,20 @@ class SimpleSwitch(app_manager.RyuApp):
              "00:00:00:00:00:09", "00:00:00:00:00:0a", "00:00:00:00:00:0b", "00:00:00:00:00:0c",
              "00:00:00:00:00:0d", "00:00:00:00:00:0e", "00:00:00:00:00:0f"]
 
-    linked_hosts = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:05",
-                    "00:00:00:00:00:06", "00:00:00:00:00:0c"]
+    linked_hosts = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:05", "00:00:00:00:00:06",
+                    "00:00:00:00:00:09", "00:00:00:00:00:0a", "00:00:00:00:00:0c"]
 
-    conn_dst = ["00:00:00:00:00:0c"]
+    udp_dst = ["00:00:00:00:00:05", "00:00:00:00:00:06"]
 
-    iot_dst = ["00:00:00:00:00:05", "00:00:00:00:00:06"]
-
-    sec_src = ["00:00:00:00:00:01", "00:00:00:00:00:02"]
+    udp_src = ["00:00:00:00:00:02"]
 
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch, self).__init__(*args, **kwargs)
 
         # outport = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
-            1: {"00:00:00:00:00:01": 1, "00:00:00:00:00:02": 2, "00:00:00:00:00:0c": 3}
+            1: {"00:00:00:00:00:01": 1, "00:00:00:00:00:02": 2, "00:00:00:00:00:09": 3, "00:00:00:00:00:0a": 3,
+                "00:00:00:00:00:0c": 3}
         }
 
     def add_flow(self, datapath, in_port, dst, src, actions):
@@ -65,40 +67,31 @@ class SimpleSwitch(app_manager.RyuApp):
 
         dpid = datapath.id
 
-        #self.mac_to_port.setdefault(dpid, {})
-
-        #self.logger.info("LOG packet in %s %s %s", dpid, src, dst, msg.in_port)
-
-        # learn a mac address to avoid FLOOD next time.
-        #self.mac_to_port[dpid][src] = msg.in_port
-
         out_port = 0
 
         if dpid in self.mac_to_port:
             if dst in self.mac_to_port[dpid]:
+                self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
                 out_port = self.mac_to_port[dpid][dst]
-            else:
-                out_port = ofproto.OFPP_FLOOD
-        else:
-            out_port = ofproto.OFPP_FLOOD
 
-        if dpid == 1 and out_port == 3 and ((src not in self.sec_src) or (dst not in self.conn_dst)):
-            self.logger.info('PACCHETTO DA SLICE 1 PER CONNECTING, INVALIDO')
+        protocol = 0
+        if pkt.get_protocol(udp.udp):
+            protocol = 1  # UDP
+        elif pkt.get_protocol(tcp.tcp):
+            protocol = 2  # TCP
+        elif pkt.get_protocol(icmp.icmp):
+            protocol = 3  # ICMP
+
+        if protocol not in [1, 2, 3]:
+            return
+
+        if protocol != 1 and src in self.udp_src and dst in self.udp_dst:
             out_port = 0
-
-        if dpid == 1 and out_port in [1, 2] and dst not in self.sec_src:
-            self.logger.info('PACCHETTO DA SLICE 1 PER SLICE 1, INVALIDO')
-            out_port = 0
-
-        if dpid == 5 and out_port in [1, 2] and ((src != "00:00:00:00:00:02") or (dst not in self.iot_dst)):
-            self.logger.info('PACCHETTO DA SLICE 1 A SLICE 3 PER S5, INVALIDO')
-            out_port = 0
-
 
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 
         # install a flow to avoid packet_in next time
-        if out_port != ofproto.OFPP_FLOOD and out_port != 0 and dst in self.linked_hosts:
+        if out_port != 0 and dst in self.linked_hosts:
             self.add_flow(datapath, msg.in_port, dst, src, actions)
 
         data = None
@@ -109,8 +102,9 @@ class SimpleSwitch(app_manager.RyuApp):
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
 
+        self.logger.info("[LOG] switch:%s src:%s dst:%s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
+                         out_port, protocol)
         if out_port != 0:
-            self.logger.info("LOG packet in %s %s %s %s %s", dpid, src, dst, msg.in_port, out_port)
             datapath.send_msg(out)
 
     @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)

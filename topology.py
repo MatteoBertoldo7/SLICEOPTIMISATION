@@ -17,7 +17,7 @@ class CustomTopology(Topo):
         connecting_slice_link_config = dict(bw=50)
         host_link_config = dict()
 
-        for i in range(6):
+        for i in range(5):
             sconfig = {"dpid": "%016x" % (i + 1)}
             self.addSwitch("s%d" % (i + 1), protocols="OpenFlow10", **sconfig)
 
@@ -41,30 +41,30 @@ class CustomTopology(Topo):
         datacollectionserver = self.addHost('server6', mac="00:00:00:00:00:08", **host_config)
 
         # Collegamenti tra switch delle slice
-        self.addLink('s1', 's6', 3, 5, **connecting_slice_link_config)
-        self.addLink('s2', 's6', 3, 8, **connecting_slice_link_config)
-        self.addLink('s3', 's6', 1, 6, **connecting_slice_link_config)
-        self.addLink('s4', 's6', 1, 7, **connecting_slice_link_config)
+        self.addLink('s1', 's5', 3, 5, **connecting_slice_link_config)
+        self.addLink('s2', 's5', 3, 8, **connecting_slice_link_config)
+        self.addLink('s3', 's5', 1, 6, **connecting_slice_link_config)
+        self.addLink('s4', 's5', 1, 7, **connecting_slice_link_config)
 
         # Collegamenti tra switch e host delle slice
         self.addLink(webcams, 's1', 1, 1, **host_link_config)
         self.addLink(sirens, 's1', 1, 2, **host_link_config)
-        self.addLink(sirens, 's5', 2, 3, **host_link_config)
+        #self.addLink(sirens, 's5', 2, 3, **host_link_config)
         self.addLink(trafficlight, 's2', 1, 1, **host_link_config)
         self.addLink(parkingsensor, 's2', 1, 2, **host_link_config)
         self.addLink(sismicsensor, 's3', 1, 2, **host_link_config)
-        self.addLink(sismicsensor, 's5', 2, 1, **host_link_config)
+        #self.addLink(sismicsensor, 's5', 2, 1, **host_link_config)
         self.addLink(watersensor, 's3', 1, 3, **host_link_config)
-        self.addLink(watersensor, 's5', 2, 2, **host_link_config)
+        #self.addLink(watersensor, 's5', 2, 2, **host_link_config)
         self.addLink(weathersensor, 's3', 1, 5, **host_link_config)
         self.addLink(schoolrouter, 's4', 1, 4, **host_link_config)
         self.addLink(townhallrouter, 's4', 1, 2, **host_link_config)
 
         # Collegamenti tra switch e server
-        self.addLink(uno_server, 's6', 1, 1, **host_link_config)
-        self.addLink(due_server, 's6', 1, 2, **host_link_config)
-        self.addLink(tre_server, 's6', 1, 3, **host_link_config)
-        self.addLink(quattro_server, 's6', 1, 4, **host_link_config)
+        self.addLink(uno_server, 's5', 1, 1, **host_link_config)
+        self.addLink(due_server, 's5', 1, 2, **host_link_config)
+        self.addLink(tre_server, 's5', 1, 3, **host_link_config)
+        self.addLink(quattro_server, 's5', 1, 4, **host_link_config)
         self.addLink(proxyserver, 's4', 1, 3, **host_link_config)
         self.addLink(datacollectionserver, 's3', 1, 4, **host_link_config)
 
@@ -86,8 +86,6 @@ if __name__ == '__main__':
     net['s2'].cmd("ovs-vsctl set-controller s2 tcp:127.0.0.1:6634")
     net['s3'].cmd("ovs-vsctl set-controller s3 tcp:127.0.0.1:6635")
     net['s4'].cmd("ovs-vsctl set-controller s4 tcp:127.0.0.1:6636")
-    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6633")
-    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6635")
-    net['s6'].cmd("ovs-vsctl set-controller s6 tcp:127.0.0.1:6637")
+    net['s5'].cmd("ovs-vsctl set-controller s5 tcp:127.0.0.1:6637")
     CLI(net)
     net.stop()
