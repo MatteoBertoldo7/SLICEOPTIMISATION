@@ -34,8 +34,10 @@ vagrant up comnetsemu
 vagrant ssh comnetsemu
 ```
 
-2. Execute the script to activate the RYU controllers and load the application:
+2. Give the permissions and execute the script to activate the RYU controllers and load the application:
 ```
+sudo mn -c
+chmod a+x slice_setup.py
 ./slice_setup.sh
 ```
 
