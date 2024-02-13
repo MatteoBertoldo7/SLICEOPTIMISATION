@@ -1,4 +1,4 @@
-# Software-Defined Networking for a Smart City 
+# Smart City's network
 
 This project has been developed for the Softwarized and Virtualized Mobile Networks course by:  
 * Nicola Conti - Matricola: 218098
