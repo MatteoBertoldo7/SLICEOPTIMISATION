@@ -30,7 +30,7 @@ class SimpleSwitch(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch, self).__init__(*args, **kwargs)
 
-        # outport = self.mac_to_port[dpid][mac_address]
+        # out_port = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
             3: {"00:00:00:00:00:02": 1, "00:00:00:00:00:0e": 1, "00:00:00:00:00:05": 2, "00:00:00:00:00:06": 3,
                 "00:00:00:00:00:08": 4, "00:00:00:00:00:07": 5}
@@ -82,21 +82,17 @@ class SimpleSwitch(app_manager.RyuApp):
 
         if dpid in self.mac_to_port:
             if dst in self.mac_to_port[dpid]:
-                self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
+                # self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
                 out_port = self.mac_to_port[dpid][dst]
 
-        #if not (pkt.get_protocol(tcp.tcp) and src in self.udp_src and dst in self.udp_dst):
-            #out_port = 1    # force port towards s5 for udp packets from 02 towards 05 or 06
-
-        if not pkt.get_protocol(tcp.tcp):
-            if (src in self.udp_src and dst in self.udp_dst):
+        if not pkt.get_protocol(tcp.tcp):                       # if packet is udp or icmp
+            if src in self.udp_src and dst in self.udp_dst:     # if it's from the link 05 / 06 -> 02
                 out_port = 1
-            elif (src in self.udp_dst and dst in self.udp_src):
-                if dst == "00:00:00:00:00:05":
+            elif src in self.udp_dst and dst in self.udp_src:   # if it's from the link 02 -> 05 / 06
+                if dst == "00:00:00:00:00:05":                  # destination is 05 -> set port 2
                     out_port = 2
-                else:
+                else:                                           # destination is 06 -> set port 3
                     out_port = 3
-
 
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 

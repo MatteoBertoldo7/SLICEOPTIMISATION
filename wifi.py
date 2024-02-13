@@ -26,7 +26,7 @@ class SimpleSwitch(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch, self).__init__(*args, **kwargs)
 
-        # outport = self.mac_to_port[dpid][mac_address]
+        # out_port = self.mac_to_port[dpid][mac_address]
         self.mac_to_port = {
             4: {"00:00:00:00:00:0f": 1, "00:00:00:00:00:01": 1, "00:00:00:00:00:0a": 2, "00:00:00:00:00:0b": 3,
                 "00:00:00:00:00:09": 4}
@@ -67,7 +67,7 @@ class SimpleSwitch(app_manager.RyuApp):
 
         if dpid in self.mac_to_port:
             if dst in self.mac_to_port[dpid]:
-                #self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
+                # self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
                 out_port = self.mac_to_port[dpid][dst]
 
         protocol = 0
@@ -95,8 +95,8 @@ class SimpleSwitch(app_manager.RyuApp):
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
 
-        #self.logger.info("[LOG] switch:%s src:%s dst:%s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
-        #                 out_port, protocol)
+        self.logger.info("[LOG] switch:%s src:%s dst:%s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
+                         out_port, protocol)
         if out_port != 0:
             datapath.send_msg(out)
 

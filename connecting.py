@@ -1,4 +1,3 @@
-from typing import Protocol
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER
@@ -38,11 +37,11 @@ class SimpleSwitch(app_manager.RyuApp):
 
     def add_flow(self, datapath, in_port, dst, src, actions, protocol):
         ofproto = datapath.ofproto
-        if protocol == 1:  # udp
+        if protocol == 1:    # udp
             proto = 0x11
         elif protocol == 2:  # tcp
             proto = 0x06
-        else:  # icmp
+        else:                # icmp
             proto = 0x01
 
         match = datapath.ofproto_parser.OFPMatch(
@@ -79,7 +78,7 @@ class SimpleSwitch(app_manager.RyuApp):
 
         if dpid in self.mac_to_port:
             if dst in self.mac_to_port[dpid]:
-                #self.logger.info('[LOG] entra in IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
+                # self.logger.info('[LOG] enters IF: dpid:%s, src:%s, dst:%s', dpid, src, dst)
                 out_port = self.mac_to_port[dpid][dst]
 
         protocol = 0
@@ -108,8 +107,8 @@ class SimpleSwitch(app_manager.RyuApp):
             datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
             actions=actions, data=data)
 
-        #self.logger.info("[LOG] switch:%s src:%s dst:%s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
-        #                 out_port, protocol)
+        self.logger.info("[LOG] switch:%s src:%s dst:%s inPort:%s outPort:%d, protocol:%d", dpid, src, dst, msg.in_port,
+                         out_port, protocol)
         datapath.send_msg(out)
 
     @set_ev_cls(ofp_event.EventOFPPortStatus, MAIN_DISPATCHER)
